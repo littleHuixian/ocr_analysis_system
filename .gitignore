@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Qt Creator
+.qtcreator/
+*.user
+
+# 构建输出与运行产物
+build/
+bin/*
+!bin/model/
+!bin/model/**
+
+# 源码压缩包
+*.zip

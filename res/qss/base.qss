@@ -1,0 +1,207 @@
+/* ============================================================
+ * base.qss - 全局样式文件
+ * 华为蓝色调主题，控件字体与背景清晰好分辨
+ * 作者: 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * ============================================================ */
+
+/* ===== 全局样式 ===== */
+* {
+    font-family: "Microsoft YaHei", "微软雅黑", Arial;
+    font-size: 13px;
+    color: #333333;
+}
+
+/* ===== 主窗口 ===== */
+QMainWindow {
+    background-color: #F0F2F5;
+}
+
+/* ===== 中央部件 ===== */
+QWidget#centralWidget {
+    background-color: #F0F2F5;
+}
+
+/* ===== 顶部工具栏面板 ===== */
+QWidget#toolBarPanel {
+    background-color: #FFFFFF;
+    border-bottom: 2px solid #007DFF;
+}
+
+/* ===== 普通按钮 ===== */
+QPushButton {
+    background-color: #FFFFFF;
+    border: 1px solid #C0C4CC;
+    border-radius: 4px;
+    padding: 6px 16px;
+    color: #333333;
+    min-width: 70px;
+}
+
+/* 按钮悬停效果 */
+QPushButton:hover {
+    background-color: #ECF5FF;
+    border-color: #007DFF;
+    color: #007DFF;
+}
+
+/* 按钮按下效果 */
+QPushButton:pressed {
+    background-color: #007DFF;
+    color: #FFFFFF;
+    border-color: #007DFF;
+}
+
+/* 按钮禁用状态 */
+QPushButton:disabled {
+    background-color: #F5F7FA;
+    color: #C0C4CC;
+    border-color: #E4E7ED;
+}
+
+/* ===== 文件列表标题标签 ===== */
+QLabel#fileListTitleLabel,
+QLabel#resultTitleLabel {
+    font-size: 14px;
+    font-weight: bold;
+    color: #007DFF;
+    padding: 4px;
+}
+
+/* ===== 文件列表 ===== */
+QListWidget {
+    background-color: #FFFFFF;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    padding: 4px;
+    outline: none;
+}
+
+/* 文件列表选中项 */
+QListWidget::item {
+    padding: 6px 8px;
+    border-radius: 2px;
+}
+
+QListWidget::item:selected {
+    background-color: #007DFF;
+    color: #FFFFFF;
+}
+
+QListWidget::item:hover {
+    /*background-color: #ECF5FF;*/
+}
+
+/* ===== 图片显示视图（GraphicsView） ===== */
+QGraphicsView {
+    background-color: rgb(43, 43, 43);
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+}
+
+/* ===== 结果表格 ===== */
+QTableWidget {
+    background-color: #FFFFFF;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    gridline-color: #EBEEF5;
+    outline: none;
+}
+
+/* 表头样式 */
+QHeaderView::section {
+    background-color: #F5F7FA;
+    color: #333333;
+    font-weight: bold;
+    padding: 6px;
+    border: none;
+    border-right: 1px solid #EBEEF5;
+    border-bottom: 1px solid #EBEEF5;
+}
+
+/* 表格选中行 */
+QTableWidget::item:selected {
+    background-color: #007DFF;
+    color: #FFFFFF;
+}
+
+/* ===== 识别结果文本框 ===== */
+QPlainTextEdit {
+    background-color: #FFFFFF;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 14px;
+}
+
+/* ===== 分割器 ===== */
+QSplitter::handle {
+    background-color: #DCDFE6;
+}
+
+QSplitter::handle:horizontal {
+    width: 3px;
+}
+
+QSplitter::handle:vertical {
+    height: 3px;
+}
+
+/* ===== 状态栏 ===== */
+QStatusBar {
+    background-color: #FFFFFF;
+    border-top: 1px solid #DCDFE6;
+    color: #666666;
+}
+
+/* ===== 进度条 ===== */
+QProgressBar {
+    border: 1px solid #DCDFE6;
+    border-radius: 3px;
+    background-color: #F5F7FA;
+    text-align: center;
+    height: 20px;
+}
+
+QProgressBar::chunk {
+    background-color: #007DFF;
+    border-radius: 2px;
+}
+
+/* ===== 滚动条 ===== */
+QScrollBar:vertical {
+    background-color: #F5F7FA;
+    width: 10px;
+    border: none;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #C0C4CC;
+    border-radius: 5px;
+    min-height: 30px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #909399;
+}
+
+QScrollBar:horizontal {
+    background-color: #F5F7FA;
+    height: 10px;
+    border: none;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #C0C4CC;
+    border-radius: 5px;
+    min-width: 30px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #909399;
+}
+
+/* ===== 分隔线 ===== */
+QFrame[frameShape="5"] {
+    color: #DCDFE6;
+    max-width: 1px;
+}

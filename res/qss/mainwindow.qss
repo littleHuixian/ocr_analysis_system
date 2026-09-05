@@ -1,0 +1,81 @@
+/* ============================================================
+ * mainwindow.qss - 主窗口专用样式
+ * 在base.qss基础上对主窗口特有控件进行样式补充
+ * 作者: 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * ============================================================ */
+
+/* 主窗口标题 */
+QMainWindow#MainWindow {
+    background-color: #F0F2F5;
+}
+
+/* 顶部工具栏按钮统一高度 */
+QWidget#toolBarPanel QPushButton {
+    min-height: 32px;
+    min-width: 80px;
+    font-size: 13px;
+}
+
+/* 导入按钮特殊样式 */
+QPushButton#importBtn,
+QPushButton#batchImportBtn {
+    background-color: #007DFF;
+    color: #FFFFFF;
+    border: 1px solid #007DFF;
+}
+
+QPushButton#importBtn:hover,
+QPushButton#batchImportBtn:hover {
+    background-color: #40A9FF;
+    border-color: #40A9FF;
+}
+
+/* 识别按钮特殊样式 */
+QPushButton#recognizeBtn,
+QPushButton#batchRecognizeBtn {
+    background-color: #52C41A;
+    color: #FFFFFF;
+    border: 1px solid #52C41A;
+}
+
+QPushButton#recognizeBtn:hover,
+QPushButton#batchRecognizeBtn:hover {
+    background-color: #73D13D;
+    border-color: #73D13D;
+}
+
+/* 导出按钮特殊样式 */
+QPushButton#exportBtn {
+    background-color: #FAAD14;
+    color: #FFFFFF;
+    border: 1px solid #FAAD14;
+}
+
+QPushButton#exportBtn:hover {
+    background-color: #FFC53D;
+    border-color: #FFC53D;
+}
+
+/* 清空按钮特殊样式 */
+QPushButton#clearBtn {
+    background-color: #FF4D4F;
+    color: #FFFFFF;
+    border: 1px solid #FF4D4F;
+}
+
+QPushButton#clearBtn:hover {
+    background-color: #FF7875;
+    border-color: #FF7875;
+}
+
+/* 文件列表面板 */
+QWidget#fileListPanel {
+    background-color: #FFFFFF;
+    border-right: 1px solid #EBEEF5;
+}
+
+/* 结果文本面板 */
+QWidget#resultTextPanel {
+    background-color: #FFFFFF;
+    border-left: 1px solid #EBEEF5;
+}
