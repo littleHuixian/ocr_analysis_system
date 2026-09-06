@@ -6,7 +6,7 @@
  *          2. CsvExporter类继承QObject，封装CSV文件写入逻辑
  *          3. 支持UTF-8 BOM编码，确保Excel等表格软件正确识别中文
  *          4. 自动处理字段中的逗号、双引号等特殊字符，符合RFC 4180规范
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #ifndef CSVEXPORTER_H

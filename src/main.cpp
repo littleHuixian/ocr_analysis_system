@@ -2,7 +2,7 @@
  * @file main.cpp
  * @brief 应用程序入口文件
  * @details ocr_analysis_system程序主入口，初始化Qt应用程序、设置UTF-8编码、创建主窗口
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author
  */
 
 #include "mainwindow.h"
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     // 设置应用程序信息
     app.setApplicationName("ocr_analysis_system");
-    app.setOrganizationName("XianTongCoding");
+    app.setOrganizationName("Huixian");
     app.setApplicationVersion("1.0.0");
 
     // 解决中文乱码：设置源码编码为UTF-8
@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 
     // 创建主窗口
     MainWindow mainWindow;
+    mainWindow.setWindowTitle("ocr_analysis_system（肖珲贤：1207162512@qq.com）");
     mainWindow.show();
 
     // 进入Qt事件循环

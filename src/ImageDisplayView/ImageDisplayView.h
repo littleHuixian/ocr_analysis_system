@@ -5,7 +5,7 @@
  *          支持鼠标滚轮缩放、拖拽平移、适应窗口、1:1原始尺寸显示
  *          支持加载OpenCV cv::Mat格式图像并转换为QPixmap显示
  *          在图像上用红框标注OCR检测到的文字区域，显示识别文本和置信度
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #ifndef IMAGEDISPLAYVIEW_H

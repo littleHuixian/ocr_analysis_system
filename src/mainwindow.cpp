@@ -8,7 +8,7 @@
  *          - CSV导出
  *          - QSS样式加载
  *          - 分割器比例设置（文件列表1/3，图像+结果2/3）
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #include "mainwindow.h"
@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <QByteArray>
 #include <QShowEvent>
+#include <QTimer>
 #include <opencv2/imgcodecs.hpp>
 
 /**
@@ -82,9 +83,13 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化信号槽连接
     initConnections();
 
+    // 默认加载工程 test_images 目录中的图片到文件列表
+    QString defaultImagesDir = QDir(QApplication::applicationDirPath() + "/../test_images").absolutePath();
+    ui->leFilePath->setText(defaultImagesDir);
+    loadImagesFromDirectory(defaultImagesDir);
+
     // 检查OCR引擎是否初始化成功
-    if (!ocrEngine->isReady())
-    {
+    if (!ocrEngine->isReady()) {
         statusLabel->setText(QString::fromUtf8("OCR引擎初始化失败，请检查模型文件"));
         QMessageBox::warning(this, QString::fromUtf8("警告"),
                              QString::fromUtf8("OCR引擎初始化失败！\n请确保model目录下存在以下文件：\n"
@@ -92,9 +97,7 @@ MainWindow::MainWindow(QWidget *parent)
                                                "ch_PP-OCRv4_rec_infer.onnx\n"
                                                "ch_ppocr_mobile_v2.0_cls_infer.onnx\n"
                                                "ppocr_keys_v1.txt"));
-    }
-    else
-    {
+    } else {
         statusLabel->setText(QString::fromUtf8("OCR引擎就绪"));
     }
 }
@@ -114,14 +117,7 @@ MainWindow::~MainWindow()
 void MainWindow::initConnections()
 {
     // 按钮点击信号连接
-    connect(ui->importBtn, &QPushButton::clicked, this, &MainWindow::onImportImage);
-    connect(ui->batchImportBtn, &QPushButton::clicked, this, &MainWindow::onBatchImport);
-    connect(ui->recognizeBtn, &QPushButton::clicked, this, &MainWindow::onRecognize);
-    connect(ui->batchRecognizeBtn, &QPushButton::clicked, this, &MainWindow::onBatchRecognize);
-    connect(ui->exportBtn, &QPushButton::clicked, this, &MainWindow::onExportCsv);
-    connect(ui->clearBtn, &QPushButton::clicked, this, &MainWindow::onClearAll);
-    connect(ui->fitBtn, &QPushButton::clicked, this, &MainWindow::onFitWindow);
-    connect(ui->resetBtn, &QPushButton::clicked, this, &MainWindow::onResetSize);
+    connect(ui->btnRefresh, &QPushButton::clicked, this, &MainWindow::onRefreshFilePath);
 
     // 文件列表选中变化
     connect(fileListWidget, &QListWidget::currentRowChanged, this, &MainWindow::onFileSelected);
@@ -164,6 +160,12 @@ void MainWindow::showEvent(QShowEvent *event)
     if (!splitterRatioSet) {
         splitterRatioSet = true;
         initSplitterRatio();
+
+        // 等窗口激活后再把焦点移开路径输入框（避免出现文本光标）
+        QTimer::singleShot(0, this, [this]() {
+            ui->leFilePath->clearFocus();
+            imageView->setFocus(Qt::OtherFocusReason);
+        });
     }
 }
 
@@ -188,17 +190,12 @@ void MainWindow::loadQssStyle()
 
         // 应用QSS样式到整个应用程序
         qApp->setStyleSheet(qssContent);
-    }
-    else
-    {
+    } else {
         qWarning() << "[MainWindow] 无法加载QSS样式文件: :/qss/base.qss";
     }
 }
 
-/**
- * @brief 导入单张图片
- * @details 打开文件选择对话框，选择一张图片导入到文件列表
- */
+//导入单张图片 打开文件选择对话框，选择一张图片导入到文件列表
 void MainWindow::onImportImage()
 {
     // 打开文件选择对话框
@@ -208,8 +205,7 @@ void MainWindow::onImportImage()
         QDir::homePath(),
         QString::fromUtf8("图片文件 (*.png *.jpg *.jpeg *.bmp *.tif *.tiff);;所有文件 (*.*)"));
 
-    if (filePath.isEmpty())
-    {
+    if (filePath.isEmpty()) {
         return; // 用户取消选择
     }
 
@@ -231,8 +227,7 @@ void MainWindow::onBatchImport()
         QDir::homePath(),
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    if (dirPath.isEmpty())
-    {
+    if (dirPath.isEmpty()) {
         return; // 用户取消选择
     }
 
@@ -242,27 +237,91 @@ void MainWindow::onBatchImport()
     filters << "*.png" << "*.jpg" << "*.jpeg" << "*.bmp" << "*.tif" << "*.tiff";
     QStringList files = directory.entryList(filters, QDir::Files, QDir::Name);
 
-    if (files.isEmpty())
-    {
+    if (files.isEmpty()) {
         QMessageBox::information(this, QString::fromUtf8("提示"),
                                  QString::fromUtf8("所选文件夹中没有找到图片文件"));
         return;
     }
 
+    ui->leFilePath->setText(dirPath);
     // 逐个添加到文件列表
-    for (const QString &file : files)
-    {
+    for (const QString &file : files) {
         QString filePath = directory.absoluteFilePath(file);
         addFileToList(filePath);
     }
 
-    statusLabel->setText(QString::fromUtf8("已导入 %1 张图片，开始自动识别...").arg(imageFiles.size()));
+    statusLabel->setText(QString::fromUtf8("已导入 %1 张图片").arg(imageFiles.size()));
 
     // 自动执行批量识别
-    if (!imageFiles.isEmpty())
-    {
-        onBatchRecognize();
+    // if (!imageFiles.isEmpty()) {
+    //     onBatchRecognize();
+    // }
+}
+
+// 按路径输入框中的目录刷新文件列表
+void MainWindow::onRefreshFilePath()
+{
+    QString dirPath = ui->leFilePath->text().trimmed();
+    if (dirPath.isEmpty()) {
+        // 输入为空时回退到默认 test_images 目录
+        dirPath = QDir(QApplication::applicationDirPath() + "/../test_images").absolutePath();
+        ui->leFilePath->setText(dirPath);
     }
+
+    QDir dir(dirPath);
+    if (!dir.exists()) {
+        QMessageBox::warning(this, QString::fromUtf8("提示"),
+                             QString::fromUtf8("目录不存在: %1").arg(dirPath));
+        return;
+    }
+
+    ui->leFilePath->setText(QDir::cleanPath(dir.absolutePath()));
+    loadImagesFromDirectory(dir.absolutePath());
+}
+
+/**
+ * @brief 加载指定目录下的图片到文件列表
+ * @details 先清空旧数据，再按文件名排序加载目录中的图片；
+ *          只填充列表，不自动选中任何一行
+ * @param dirPath 图片目录路径
+ */
+void MainWindow::loadImagesFromDirectory(const QString &dirPath)
+{
+    QDir directory(dirPath);
+    if (!directory.exists()) {
+        statusLabel->setText(QString::fromUtf8("目录不存在: %1").arg(dirPath));
+        return;
+    }
+
+    // 清空旧的图片列表、OCR结果和图像显示
+    imageFiles.clear();
+    fileListWidget->clear();
+    ocrRecords.clear();
+    ocrBoxesList.clear();
+    ocrResultImgs.clear();
+    resultTextEdit->clear();
+    imageView->clearImage();
+    currentImageIndex = -1;
+
+    // 搜索目录下的所有图片文件
+    QStringList filters;
+    filters << "*.png" << "*.jpg" << "*.jpeg" << "*.bmp" << "*.tif" << "*.tiff";
+    QStringList files = directory.entryList(filters, QDir::Files, QDir::Name);
+    if (files.isEmpty()) {
+        statusLabel->setText(QString::fromUtf8("目录中没有找到图片: %1").arg(dirPath));
+        return;
+    }
+
+    // 批量加入文件列表，期间屏蔽信号避免逐个触发选中
+    fileListWidget->blockSignals(true);
+    for (const QString &file : files) {
+        addFileToList(directory.absoluteFilePath(file));
+    }
+    // addFileToList 内部会自动设置当前行，加载完成后清除选中态
+    fileListWidget->setCurrentRow(-1);
+    fileListWidget->blockSignals(false);
+
+    statusLabel->setText(QString::fromUtf8("已加载 %1 张图片").arg(imageFiles.size()));
 }
 
 /**
@@ -272,8 +331,7 @@ void MainWindow::onBatchImport()
 void MainWindow::addFileToList(const QString &filePath)
 {
     // 避免重复添加
-    if (imageFiles.contains(filePath))
-    {
+    if (imageFiles.contains(filePath)) {
         return;
     }
 
@@ -299,8 +357,7 @@ void MainWindow::addFileToList(const QString &filePath)
  */
 void MainWindow::onFileSelected(int currentRow)
 {
-    if (currentRow < 0 || currentRow >= imageFiles.size())
-    {
+    if (currentRow < 0 || currentRow >= imageFiles.size()) {
         return;
     }
 
@@ -310,12 +367,9 @@ void MainWindow::onFileSelected(int currentRow)
     displayOcrResult(currentRow);
 
     // 如果该图片已识别，显示识别结果
-    if (currentRow < ocrRecords.size())
-    {
+    if (currentRow < ocrRecords.size()) {
         resultTextEdit->setPlainText(ocrRecords[currentRow].result);
-    }
-    else
-    {
+    } else {
         resultTextEdit->clear();
     }
 }
@@ -330,8 +384,7 @@ void MainWindow::displayImage(const QString &filePath)
 {
     // 使用QFile读取文件（支持中文路径）
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::warning(this, QString::fromUtf8("错误"),
                              QString::fromUtf8("无法加载图片: %1").arg(filePath));
         return;
@@ -343,8 +396,7 @@ void MainWindow::displayImage(const QString &filePath)
 
     // 使用cv::imdecode从内存数据解码图片（绕过中文路径问题）
     cv::Mat img = cv::imdecode(cv::Mat(1, fileData.size(), CV_8UC1, fileData.data()), cv::IMREAD_COLOR);
-    if (img.empty())
-    {
+    if (img.empty()) {
         QMessageBox::warning(this, QString::fromUtf8("错误"),
                              QString::fromUtf8("无法解码图片: %1").arg(filePath));
         return;
@@ -360,23 +412,21 @@ void MainWindow::displayImage(const QString &filePath)
  */
 void MainWindow::onRecognize()
 {
-    if (currentImageIndex < 0 || currentImageIndex >= imageFiles.size())
-    {
+    if (currentImageIndex < 0 || currentImageIndex >= imageFiles.size()) {
         QMessageBox::information(this, QString::fromUtf8("提示"),
                                  QString::fromUtf8("请先选择一张图片"));
         return;
     }
 
-    if (!ocrEngine->isReady())
-    {
+    if (!ocrEngine->isReady()) {
         QMessageBox::warning(this, QString::fromUtf8("警告"),
                              QString::fromUtf8("OCR引擎未初始化，请检查模型文件"));
         return;
     }
 
     // 禁用按钮防止重复操作
-    ui->recognizeBtn->setEnabled(false);
-    ui->batchRecognizeBtn->setEnabled(false);
+    ui->action_recognize->setEnabled(false);
+    ui->action_ocrs->setEnabled(false);
 
     // 执行识别
     QString filePath = imageFiles[currentImageIndex];
@@ -392,15 +442,11 @@ void MainWindow::onRecognize()
     record.timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
     // 更新或添加识别记录
-    if (currentImageIndex < ocrRecords.size())
-    {
+    if (currentImageIndex < ocrRecords.size()) {
         ocrRecords[currentImageIndex] = record;
-    }
-    else
-    {
+    } else {
         // 补齐缺失的记录
-        while (ocrRecords.size() < currentImageIndex)
-        {
+        while (ocrRecords.size() < currentImageIndex) {
             OcrRecord emptyRecord;
             emptyRecord.fileName = QFileInfo(imageFiles[ocrRecords.size()]).fileName();
             emptyRecord.result = "";
@@ -411,26 +457,22 @@ void MainWindow::onRecognize()
     }
 
     // 恢复按钮状态
-    ui->recognizeBtn->setEnabled(true);
-    ui->batchRecognizeBtn->setEnabled(true);
+    ui->action_recognize->setEnabled(true);
+    ui->action_ocrs->setEnabled(true);
 
     statusLabel->setText(QString::fromUtf8("识别完成"));
 }
 
-/**
- * @brief 批量识别所有图片
- */
+// 批量识别所有图片
 void MainWindow::onBatchRecognize()
 {
-    if (imageFiles.isEmpty())
-    {
+    if (imageFiles.isEmpty()) {
         QMessageBox::information(this, QString::fromUtf8("提示"),
                                  QString::fromUtf8("请先导入图片"));
         return;
     }
 
-    if (!ocrEngine->isReady())
-    {
+    if (!ocrEngine->isReady()) {
         QMessageBox::warning(this, QString::fromUtf8("警告"),
                              QString::fromUtf8("OCR引擎未初始化，请检查模型文件"));
         return;
@@ -443,10 +485,11 @@ void MainWindow::onBatchRecognize()
     isBatchProcessing = true;
 
     // 禁用按钮
-    ui->recognizeBtn->setEnabled(false);
-    ui->batchRecognizeBtn->setEnabled(false);
-    ui->importBtn->setEnabled(false);
-    ui->batchImportBtn->setEnabled(false);
+    ui->actionSelectFile->setEnabled(false);
+    ui->action_add->setEnabled(false);
+    ui->action_recognize->setEnabled(false);
+    ui->action_ocrs->setEnabled(false);
+
 
     // 显示进度条
     progressBar->setVisible(true);
@@ -454,8 +497,7 @@ void MainWindow::onBatchRecognize()
     progressBar->setValue(0);
 
     // 逐张识别
-    for (int i = 0; i < imageFiles.size(); ++i)
-    {
+    for (int i = 0; i < imageFiles.size(); ++i) {
         progressBar->setValue(i);
         statusLabel->setText(QString::fromUtf8("正在识别 %1/%2: %3")
                              .arg(i + 1)
@@ -491,10 +533,11 @@ void MainWindow::onBatchRecognize()
     isBatchProcessing = false;
 
     // 恢复按钮
-    ui->recognizeBtn->setEnabled(true);
-    ui->batchRecognizeBtn->setEnabled(true);
-    ui->importBtn->setEnabled(true);
-    ui->batchImportBtn->setEnabled(true);
+    ui->actionSelectFile->setEnabled(true);
+    ui->action_add->setEnabled(true);
+    ui->action_recognize->setEnabled(true);
+    ui->action_ocrs->setEnabled(true);
+
 
     statusLabel->setText(QString::fromUtf8("批量识别完成，共 %1 张").arg(imageFiles.size()));
 }
@@ -515,23 +558,19 @@ QString MainWindow::recognizeImage(const QString &filePath)
     // 调用OCR引擎执行识别
     bool success = ocrEngine->run(filePath, boxes, recText, resultImg);
 
-    if (success && !resultImg.empty())
-    {
+    if (success && !resultImg.empty()) {
         // 在ImageDisplayView中显示带标注的结果图像
         imageView->setMatImage(resultImg);
         imageView->setTextBoxes(boxes);
         imageView->fitToWindow();
-    }
-    else
-    {
+    } else {
         // 识别失败，显示原图
         displayImage(filePath);
     }
 
     // 保存OCR结果到对应索引位置（用于切换图片时恢复标注）
     int index = imageFiles.indexOf(filePath);
-    if (index >= 0)
-    {
+    if (index >= 0) {
         // 确保列表长度足够
         while (ocrBoxesList.size() <= index) {
             ocrBoxesList.append(std::vector<TextBox>());
@@ -554,28 +593,21 @@ QString MainWindow::recognizeImage(const QString &filePath)
  */
 void MainWindow::displayOcrResult(int index)
 {
-    if (index < 0 || index >= imageFiles.size())
-    {
+    if (index < 0 || index >= imageFiles.size()) {
         return;
     }
 
     // 检查该图片是否有保存的OCR结果
-    if (index < ocrResultImgs.size() && !ocrResultImgs[index].empty())
-    {
+    if (index < ocrResultImgs.size() && !ocrResultImgs[index].empty()) {
         // 有OCR结果，恢复显示带标注的结果图像和文本框
         imageView->setMatImage(ocrResultImgs[index]);
-        if (index < ocrBoxesList.size() && !ocrBoxesList[index].empty())
-        {
+        if (index < ocrBoxesList.size() && !ocrBoxesList[index].empty()) {
             imageView->setTextBoxes(ocrBoxesList[index]);
-        }
-        else
-        {
+        } else {
             imageView->clearTextBoxes();
         }
         imageView->fitToWindow();
-    }
-    else
-    {
+    } else {
         // 无OCR结果，显示原图
         displayImage(imageFiles[index]);
     }
@@ -586,8 +618,7 @@ void MainWindow::displayOcrResult(int index)
  */
 void MainWindow::onExportCsv()
 {
-    if (ocrRecords.isEmpty())
-    {
+    if (ocrRecords.isEmpty()) {
         QMessageBox::information(this, QString::fromUtf8("提示"),
                                  QString::fromUtf8("没有可导出的识别记录"));
         return;
@@ -606,16 +637,13 @@ void MainWindow::onExportCsv()
     }
 
     // 执行导出
-    if (csvExporter->exportToCsv(savePath, ocrRecords))
-    {
+    if (csvExporter->exportToCsv(savePath, ocrRecords)) {
         QMessageBox::information(this, QString::fromUtf8("成功"),
                                  QString::fromUtf8("导出成功: %1\n共 %2 条记录")
                                  .arg(savePath)
                                  .arg(ocrRecords.size()));
         statusLabel->setText(QString::fromUtf8("CSV导出成功"));
-    }
-    else
-    {
+    } else {
         QMessageBox::critical(this, QString::fromUtf8("失败"),
                               QString::fromUtf8("导出失败，请检查文件路径权限"));
     }
@@ -645,25 +673,19 @@ void MainWindow::onLogMessage(const QString &message)
     qDebug() << "[OCR]" << message;
 }
 
-/**
- * @brief 适应窗口显示
- */
+// 适应窗口显示
 void MainWindow::onFitWindow()
 {
     imageView->fitToWindow();
 }
 
-/**
- * @brief 恢复1:1原始尺寸
- */
+// 恢复1:1原始尺寸
 void MainWindow::onResetSize()
 {
     imageView->resetToOriginalSize();
 }
 
-/**
- * @brief 清空所有数据（包括图片显示）
- */
+//清空所有数据（包括图片显示）
 void MainWindow::onClearAll()
 {
     // 清空文件列表
@@ -686,3 +708,46 @@ void MainWindow::onClearAll()
 
     statusLabel->setText(QString::fromUtf8("已清空所有数据"));
 }
+
+
+void MainWindow::on_actionSelectFile_triggered()
+{
+    onBatchImport();
+}
+
+void MainWindow::on_action_add_triggered()
+{
+    onImportImage();
+}
+
+void MainWindow::on_action_recognize_triggered()
+{
+    onRecognize();
+}
+
+void MainWindow::on_action_ocrs_triggered()
+{
+    onBatchRecognize();
+}
+
+void MainWindow::on_action_clear_triggered()
+{
+    onClearAll();
+    onRefreshFilePath();
+}
+
+void MainWindow::on_action_CSV_triggered()
+{
+    onExportCsv();
+}
+
+void MainWindow::on_action_resize_triggered()
+{
+    onFitWindow();
+}
+
+void MainWindow::on_action_full_triggered()
+{
+    onResetSize();
+}
+

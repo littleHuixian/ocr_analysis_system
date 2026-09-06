@@ -31,157 +31,51 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" name="toolBarPanel" native="true">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>50</height>
-       </size>
-      </property>
-      <layout class="QHBoxLayout" name="toolBarLayout">
-       <property name="spacing">
-        <number>8</number>
-       </property>
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>6</number>
-       </property>
-       <property name="rightMargin">
-        <number>10</number>
-       </property>
-       <property name="bottomMargin">
-        <number>6</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="importBtn">
-         <property name="text">
-          <string>导入图片</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="recognizeBtn">
-         <property name="text">
-          <string>识别</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="sepLine1">
-         <property name="frameShape">
-          <enum>QFrame::VLine</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="batchImportBtn">
-         <property name="text">
-          <string>批量导入</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="batchRecognizeBtn">
-         <property name="text">
-          <string>批量识别</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="sepLine2">
-         <property name="frameShape">
-          <enum>QFrame::VLine</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="exportBtn">
-         <property name="text">
-          <string>导出CSV</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="clearBtn">
-         <property name="text">
-          <string>清空</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="toolBarSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="fitBtn">
-         <property name="text">
-          <string>适应窗口</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="resetBtn">
-         <property name="text">
-          <string>1:1显示</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
      <widget class="QSplitter" name="mainSplitter">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="handleWidth">
        <number>3</number>
       </property>
       <widget class="QWidget" name="fileListPanel" native="true">
-       <layout class="QVBoxLayout" name="fileListLayout">
-        <property name="spacing">
-         <number>6</number>
-        </property>
-        <property name="leftMargin">
-         <number>8</number>
-        </property>
-        <property name="topMargin">
-         <number>8</number>
-        </property>
-        <property name="rightMargin">
-         <number>8</number>
-        </property>
-        <property name="bottomMargin">
-         <number>8</number>
-        </property>
-        <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="labelFilePath">
+            <property name="text">
+             <string>文件路径</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="leFilePath">
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnRefresh">
+            <property name="text">
+             <string>刷新</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
          <widget class="QLabel" name="fileListTitleLabel">
           <property name="text">
            <string>文件列表</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="2" column="0">
          <widget class="QListWidget" name="fileListWidget">
           <property name="minimumSize">
            <size>
@@ -195,7 +89,7 @@
       </widget>
       <widget class="QSplitter" name="rightSplitter">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <property name="handleWidth">
         <number>3</number>
@@ -240,7 +134,7 @@
             <string>识别结果（可编辑修正）</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -255,6 +149,156 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>40</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionSelectFile"/>
+   <addaction name="action_add"/>
+   <addaction name="action_recognize"/>
+   <addaction name="action_ocrs"/>
+   <addaction name="action_clear"/>
+   <addaction name="action_CSV"/>
+   <addaction name="action_logview"/>
+   <addaction name="action_database"/>
+   <addaction name="action_resize"/>
+   <addaction name="action_full"/>
+  </widget>
+  <action name="actionSelectFile">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/select_file.png</normaloff>:/images/select_file.png</iconset>
+   </property>
+   <property name="text">
+    <string>选择文件</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_recognize">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/ocr_scan.png</normaloff>:/images/ocr_scan.png</iconset>
+   </property>
+   <property name="text">
+    <string>OCR识别</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_ocrs">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/ocr_multi.png</normaloff>:/images/ocr_multi.png</iconset>
+   </property>
+   <property name="text">
+    <string>批量识别</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_CSV">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/export_csv.png</normaloff>:/images/export_csv.png</iconset>
+   </property>
+   <property name="text">
+    <string>导出CSV</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_clear">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/clear.png</normaloff>:/images/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>清除</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_add">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/add_picture.png</normaloff>:/images/add_picture.png</iconset>
+   </property>
+   <property name="text">
+    <string>新增图片</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_resize">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/view_resize.png</normaloff>:/images/view_resize.png</iconset>
+   </property>
+   <property name="text">
+    <string>适应窗口</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_full">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/view_full.png</normaloff>:/images/view_full.png</iconset>
+   </property>
+   <property name="text">
+    <string>1:1显示</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_logview">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/logview.png</normaloff>:/images/logview.png</iconset>
+   </property>
+   <property name="text">
+    <string>日志查看</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_database">
+   <property name="icon">
+    <iconset resource="../images/images.qrc">
+     <normaloff>:/images/database.png</normaloff>:/images/database.png</iconset>
+   </property>
+   <property name="text">
+    <string>识别记录</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -263,6 +307,8 @@
    <header>ImageDisplayView/ImageDisplayView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../images/images.qrc"/>
+ </resources>
  <connections/>
 </ui>

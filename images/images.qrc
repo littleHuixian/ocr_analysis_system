@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>clear.png</file>
+        <file>export_csv.png</file>
+        <file>ocr_multi.png</file>
+        <file>ocr_scan.png</file>
+        <file>select_file.png</file>
+        <file>add_picture.png</file>
+        <file>view_full.png</file>
+        <file>view_resize.png</file>
+        <file>database.png</file>
+        <file>logview.png</file>
+    </qresource>
+</RCC>

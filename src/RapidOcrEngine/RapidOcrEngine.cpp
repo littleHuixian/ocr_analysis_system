@@ -6,7 +6,7 @@
  *          2. 文本区域裁剪→分类模型预处理→推理（方向判断）
  *          3. 识别模型预处理→推理（CTC解码→文本输出）
  *          直接使用C API调用ONNX Runtime，避免C++封装层在MinGW下的编译兼容性问题
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #include "RapidOcrEngine.h"

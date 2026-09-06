@@ -7,7 +7,7 @@
  *          3. 文字识别模型(ch_PP-OCRv4_rec)：将文字区域图像转换为文本
  *          支持汉字、数字、英文字母、常见符号识别，自适应不同分辨率图片
  *          使用C API直接调用ONNX Runtime，避免C++封装层的MinGW兼容性问题
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #ifndef RAPIDOCRENGINE_H

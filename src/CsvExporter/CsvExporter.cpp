@@ -7,7 +7,7 @@
  *          3. 写入CSV表头行（图片名,识别结果,时间戳）
  *          4. 遍历识别记录，逐行写入并处理特殊字符转义
  *          兼容Qt5（QTextCodec）和Qt6（QStringConverter）的编码设置接口
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #include "CsvExporter.h"

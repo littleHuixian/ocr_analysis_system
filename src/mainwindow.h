@@ -3,7 +3,7 @@
  * @brief 主窗口头文件
  * @details ocr_analysis_system主窗口类，整合OCR引擎、图片显示、文件列表、
  *          结果文本编辑器，提供完整的文字识别交互界面
- * @author 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
+ * @author 
  */
 
 #ifndef MAINWINDOW_H
@@ -103,10 +103,28 @@ private slots:
      */
     void onResetSize();
 
-    /**
-     * @brief 清空所有数据（包括图片显示）
-     */
+    //清空所有数据（包括图片显示）
     void onClearAll();
+
+    /**
+     * @brief 按输入框中的路径刷新文件列表
+     */
+    void onRefreshFilePath();
+
+    void on_actionSelectFile_triggered();
+    void on_action_add_triggered();
+    void on_action_recognize_triggered();
+    // 工具栏“清除”动作（自动连接到 action_clear）
+    void on_action_clear_triggered();
+
+
+    void on_action_ocrs_triggered();
+
+    void on_action_CSV_triggered();
+
+    void on_action_resize_triggered();
+
+    void on_action_full_triggered();
 
 protected:
     /**
@@ -139,6 +157,12 @@ private:
      * @param filePath 图片文件路径
      */
     void addFileToList(const QString &filePath);
+
+    /**
+     * @brief 加载指定目录下的图片到文件列表
+     * @param dirPath 图片目录路径
+     */
+    void loadImagesFromDirectory(const QString &dirPath);
 
     /**
      * @brief 显示指定路径的图片（支持中文路径）
