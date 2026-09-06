@@ -44,11 +44,13 @@ ocr_analysis_system/
 
 ### Windows（MinGW 64-bit）
 
-- Qt 5.14.0 `mingw73_64`
-- OpenCV 4.5.2 MinGW
+- Qt 6.11.1 `mingw_64`（本机 `D:\Qt\Qt6.11\6.11.1\mingw_64`）
+- OpenCV 4.5.3 MinGW（本机 `D:\OpenCV453\build\install`，使用 `include`、`x64\mingw\lib`、`x64\mingw\bin`）
 - ONNX Runtime 1.16.3 MinGW
 
-Windows 依赖随工程放在 `3rd/` 与 `bin/` 下，可直接使用 `build.bat`。
+工程内 `3rd/` 仍保留 OpenCV 4.5.2 导入库与 ONNX Runtime 依赖：
+本机存在 `D:\OpenCV453` 时工程自动使用 OpenCV 4.5.3，不存在时回退到 `3rd/` 自带的 4.5.2。
+可直接使用 `build.bat` 或 Qt Creator 构建。
 
 ## macOS 构建
 
@@ -94,6 +96,14 @@ build.bat
 
 ```text
 bin\ocr_analysis_system.exe
+```
+
+运行前需保证可找到以下 DLL：
+
+```text
+D:\OpenCV453\build\install\x64\mingw\bin   # OpenCV 4.5.3 DLL
+D:\Qt\Qt6.11\6.11.1\mingw_64\bin           # Qt 6.11.1 DLL
+onnxruntime.dll                            # 与 exe 同目录或加入 PATH
 ```
 
 ## 使用

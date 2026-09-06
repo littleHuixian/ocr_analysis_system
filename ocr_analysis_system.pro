@@ -1,11 +1,11 @@
 # ============================================================
 # 项目名: ocr_analysis_system
-# 描述: Qt5 + OpenCV + ONNX Runtime 字符识别工具
+# 描述: Qt + OpenCV + ONNX Runtime 字符识别工具
 #       基于PP-OCRv4模型，支持图片文字检测、方向分类、文字识别
 #       支持批量识别、结果编辑、CSV导出
-# Qt版本: Windows: Qt5.14.0 (mingw73_64); macOS: Qt6 (Homebrew arm64)
+# Qt版本: Windows: Qt6.11.1 (mingw_64); macOS: Qt6 (Homebrew arm64)
 # 构建系统: qmake
-# OpenCV版本: Windows: 4.5.2 (MinGW 64-bit)
+# OpenCV版本: Windows: 4.5.3 (本机 D:\OpenCV453, MinGW 64-bit)，缺省回退 4.5.2
 #             macOS: 5.1.0 (/opt/opencv, arm64)
 # ONNX Runtime: 1.16.3 (Windows: MinGW 64-bit; macOS: arm64)
 # ============================================================
@@ -41,28 +41,48 @@ INCLUDEPATH += \
     $$PWD/src \
     $$UI_DIR
 
+# Windows: 使用本机 D:\OpenCV453 提供的 OpenCV 4.5.3 头文件；
+# 本机安装目录不存在时回退到 3rd/include 中随工程提供的 4.5.2。
+# 注意该路径必须排在 3rd/include 之前，避免先命中旧版 OpenCV 头文件。
+win32:OPENCV_DIR = D:/OpenCV453/build/install
+
+win32 {
+    exists($$OPENCV_DIR/include/opencv2/opencv.hpp) {
+        INCLUDEPATH += \
+            $$OPENCV_DIR/include \
+            $$OPENCV_DIR/include/opencv2
+    }
+}
+
 # macOS下优先使用 /opt/opencv 提供的 OpenCV 5 头文件，
 # 避免命中 3rd/include 中仅适用于 Windows 的 OpenCV 4.5.2 头文件。
 macx {
     INCLUDEPATH += /opt/opencv/include/opencv5
 }
 
-# ONNX Runtime 头文件仍复用 3rd/include（该目录下不再作为 OpenCV 头文件来源）
+# ONNX Runtime 头文件仍复用 3rd/include（Windows OpenCV 优先使用上方本机 4.5.3）
 INCLUDEPATH += $$PWD/3rd/include
 
 # ============================================================
-# OpenCV 库链接路径（Windows 使用打包的 MinGW 4.5.2）
+# OpenCV 库链接路径
+# Windows: 本机 OpenCV 4.5.3 (D:\OpenCV453)；
+#          本机安装目录不存在时回退到随工程打包的 4.5.2 (3rd/lib)
 # ============================================================
 win32 {
     # ONNX Runtime C++头文件与MinGW存在类型转换兼容性问题，需要-fpermissive降级为警告
     QMAKE_CXXFLAGS += -fpermissive
 
-    LIBS += -L$$PWD/3rd/lib \
-        -lopencv_core452 \
-        -lopencv_imgproc452 \
-        -lopencv_imgcodecs452 \
-        -lopencv_highgui452 \
-        -lopencv_dnn452
+    exists($$OPENCV_DIR/x64/mingw/lib/libopencv_core453.dll.a) {
+        # 将 x64/mingw/lib 下全部 libopencv_*.dll.a 作为显式库文件链接
+        LIBS += $$files($$OPENCV_DIR/x64/mingw/lib/libopencv_*.a)
+    } else {
+        LIBS += -L$$PWD/3rd/lib \
+            -lopencv_core452 \
+            -lopencv_imgproc452 \
+            -lopencv_imgcodecs452 \
+            -lopencv_highgui452 \
+            -lopencv_dnn452
+    }
 }
 
 # macOS: 链接本机 /opt/opencv 的 OpenCV 5.1.0 arm64 动态库

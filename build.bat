@@ -2,13 +2,13 @@
 chcp 65001 >nul
 REM ============================================================
 REM ocr_analysis_system 编译脚本
-REM 环境要求: Qt5.14.0 mingw73_64 + OpenCV4.5.2 + ONNX Runtime1.16.3 (MinGW 64-bit)
+REM 环境要求: Qt6.11.1 mingw_64 + OpenCV4.5.3(D:\OpenCV453) + ONNX Runtime1.16.3 (MinGW 64-bit)
 REM 作者: 先瞳编码, 关注微信公众号"先瞳编码"，获取最新技术分享
 REM ============================================================
 
 REM 设置 Qt 与 MinGW 环境变量
-set QT_DIR=E:\program\Qt\5.14.0\mingw73_64
-set MINGW_DIR=E:\program\Qt\Tools\mingw730_64
+set QT_DIR=D:\Qt\Qt6.11\6.11.1\mingw_64
+set MINGW_DIR=D:\Qt\Qt6.11\Tools\mingw1310_64
 set PATH=%QT_DIR%\bin;%MINGW_DIR%\bin;%PATH%
 
 REM 记录工程根目录
