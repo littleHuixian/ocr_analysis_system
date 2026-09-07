@@ -84,7 +84,11 @@ MainWindow::MainWindow(QWidget *parent)
     initConnections();
 
     // 默认加载工程 test_images 目录中的图片到文件列表
-    QString defaultImagesDir = QDir(QApplication::applicationDirPath() + "/../test_images").absolutePath();
+    QString defaultImagesDir = QDir(QApplication::applicationDirPath() + "/test_images").absolutePath();
+    if (!QDir(defaultImagesDir).exists()) {
+        // 默认目录不存在时自动创建，方便用户直接放入图片
+        QDir().mkpath(defaultImagesDir);
+    }
     ui->leFilePath->setText(defaultImagesDir);
     loadImagesFromDirectory(defaultImagesDir);
 
@@ -264,7 +268,7 @@ void MainWindow::onRefreshFilePath()
     QString dirPath = ui->leFilePath->text().trimmed();
     if (dirPath.isEmpty()) {
         // 输入为空时回退到默认 test_images 目录
-        dirPath = QDir(QApplication::applicationDirPath() + "/../test_images").absolutePath();
+        dirPath = QDir(QApplication::applicationDirPath() + "/test_images").absolutePath();
         ui->leFilePath->setText(dirPath);
     }
 
